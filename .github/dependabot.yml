@@ -1,0 +1,22 @@
+# 依存の更新（開発ルール集（非公開） §5：Actions は SHA に固定・依存はロックファイルで固定。その更新を自動の PR で行う）
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    commit-message:
+      prefix: ci
+    groups:
+      actions:
+        patterns: ["*"]
+
+  - package-ecosystem: npm
+    directory: /Tools/CI
+    schedule:
+      interval: weekly
+    commit-message:
+      prefix: ci
+    groups:
+      ci-tools:
+        patterns: ["*"]

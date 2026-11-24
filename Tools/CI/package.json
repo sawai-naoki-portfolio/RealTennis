@@ -1,0 +1,10 @@
+{
+  "name": "realtennis-ci-tools",
+  "private": true,
+  "description": "CI の検査で使う Node のツール（Mermaid 図の描画の検査）",
+  "license": "UNLICENSED",
+  "engines": { "node": ">=22" },
+  "devDependencies": {
+    "@mermaid-js/mermaid-cli": "12.2.0"
+  }
+}

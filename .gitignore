@@ -1,0 +1,39 @@
+# ---- Unreal Engine ----
+Binaries/
+Intermediate/
+Saved/
+DerivedDataCache/
+Build/*/
+!Build/*/Resources/
+Plugins/*/Binaries/
+Plugins/*/Intermediate/
+*.sln
+*.slnx
+*.sdf
+*.suo
+*.opensdf
+*.VC.db
+*.VC.opendb
+.vs/
+.vscode/
+.idea/
+*.code-workspace
+
+# 個人の作業用（Content/Developers は出荷物に含めない。コレクションも個人設定）
+Content/Developers/
+Content/Collections/
+
+# ---- Blender ----
+*.blend1
+*.blend2
+Export/
+
+# ---- ツール ----
+node_modules/
+__pycache__/
+*.pyc
+
+# ---- Claude Code（個人のローカル設定） ----
+.claude/
+CLAUDE.md
+.mcp.json
