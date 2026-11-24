@@ -1,0 +1,44 @@
+// W-3.4：ストロークの選択（DD-03 §5.1）。表の入力を打点の候補と球種から作る。表がなければ選ばない。
+// 表を使う選択のテストは、表を作る道具と一緒に TennisStrokeChooserTests.cpp にある。
+#include "CQTest.h"
+#include "Data/StrokeData.h"
+#include "Player/TennisStrokeSelection.h"
+
+TEST_CLASS(TennisStrokeSelectionInput, "Tennis.Game.Stroke")
+{
+	// 候補の向き・高さ・ストレッチ・時刻と、球種・バックハンドの打ち方から入力を作る。準備時間は「候補の時刻 − 今」
+	TEST_METHOD(MakeInput_FillsFromTheCandidate)
+	{
+		FHitCandidate Candidate;
+		Candidate.Side = EStrokeSide::Backhand;
+		Candidate.Kind = EHitKind::Groundstroke;
+		Candidate.BallPos = FVector(-10.0, 1.0, 0.55);
+		Candidate.bStretch = true;
+		Candidate.Time = 12.0;
+		const FTennisStrokeChooserInput Input = TennisStrokeSelection::MakeInput(Candidate, ETennisShotType::Slice, EBackhandStyle::OneHanded, 11.0);
+		ASSERT_THAT(IsTrue(Input.Side == EStrokeSide::Backhand && Input.BackhandStyle == EBackhandStyle::OneHanded));
+		ASSERT_THAT(IsTrue(Input.Height == EStrokeHeightBand::Low && Input.Reach == EStrokeReach::Stretch));
+		ASSERT_THAT(IsTrue(Input.HitHeight == 0.55));  // 高さの変種の範囲の列に渡す打点の高さ（m）
+		ASSERT_THAT(IsTrue(Input.Family == EStrokeFamily::Slice && Input.Stance == EStrokeStance::Square));
+		ASSERT_THAT(IsNear(1.0f, Input.TimeBudget, 1e-6f));
+	}
+
+	// 準備時間が既定（0.30 s）より短いグラウンドストロークは Block。過ぎた候補の準備時間は 0
+	TEST_METHOD(MakeInput_ShortTimeBudgetBlocks)
+	{
+		FHitCandidate Candidate;
+		Candidate.BallPos = FVector(-10.0, 1.0, 1.0);
+		Candidate.Time = 5.2;
+		ASSERT_THAT(IsTrue(TennisStrokeSelection::MakeInput(Candidate, ETennisShotType::Topspin, EBackhandStyle::TwoHanded, 5.0).Family == EStrokeFamily::Block));
+		const FTennisStrokeChooserInput Late = TennisStrokeSelection::MakeInput(Candidate, ETennisShotType::Topspin, EBackhandStyle::TwoHanded, 6.0);
+		ASSERT_THAT(IsNear(0.0f, Late.TimeBudget, 1e-6f));
+		ASSERT_THAT(IsTrue(Late.Family == EStrokeFamily::Block));
+	}
+
+	// 表がなければ選ばない（警告を出し、nullptr）
+	TEST_METHOD(Select_WithoutTableReturnsNull)
+	{
+		FTennisStrokeChooserInput Input;
+		ASSERT_THAT(IsTrue(TennisStrokeSelection::Select(nullptr, Input) == nullptr));
+	}
+};
